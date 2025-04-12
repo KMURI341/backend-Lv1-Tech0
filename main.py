@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from backend.database import engine, Base, get_db  # 絶対インポート
-from backend.models import MProductMurai as Product, TransactionMurai as Transaction, TransactionDetailsMurai as TransactionDetail  # 絶対インポート
+from database import engine, Base, get_db
+from models import MProductMurai as Product, TransactionMurai as Transaction, TransactionDetailsMurai as TransactionDetail 
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -9,10 +9,21 @@ from typing import List
 app = FastAPI()
 
 # CORS 設定（Next.js からのリクエストを許可）
-app.add_middleware( CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"], allow_credentials=True, allow_methods=[""], allow_headers=[""], )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 初回起動時にテーブルを作成
 Base.metadata.create_all(bind=engine)
+
+# ルートエンドポイント（"/"）
+@app.get("/")
+def root():
+    return {"message": "FastAPI backend is up and running!"}
 
 # ✅ `/hello` エンドポイント（Next.js の GET 用）
 @app.get("/hello")
